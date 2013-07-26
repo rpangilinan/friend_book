@@ -51,47 +51,41 @@ class Users extends Main
 	public function sign_out()
 	{
 		$this->session->sess_destroy();
-		redirect(base_url('/login'));
+		redirect(base_url('/users/sign_in'));
 	}
 	
 	public function register_user()
 	{
-		$post_data = $this->input->post();
-		$this->load->library('form_validation');
-		$this->form_validation->set_rules('first_name', 'First Name', 'required');
-		$this->form_validation->set_rules('last_name', 'Last Name', 'required');
-		$this->form_validation->set_rules('user_name', 'Username', 'required');
-		$this->form_validation->set_rules('password', 'Password', 'min_length[8]|required|');
-		
-		if($this->form_validation->run() === FALSE)
+		$user = new User();
+
+		$user->first_name = $this->input->post('first_name');
+		$user->last_name = $this->input->post('last_name');
+		$user->email = $this->input->post('email');
+		$user->password = $this->input->post('password');
+		$user->created_at = date('Y:m:d h:i:s a', time());
+
+		if($user->save())
 		{
-			$data['errors'] = validation_errors();
-			$data['success'] = FALSE;
-			echo json_encode($data);
+			$data['status'] = TRUE;
+			$data['location'] = '/users/sign_in';
 		}
 		else
 		{
-			$add_user = $this->User_model->add_user($this->input->post());
-
-			$data['success'] = TRUE;
-			$data['location'] = '/login';
-			echo json_encode($data);	
-
+			$data['message'] = $user->error->string;
+			$data['status'] = FALSE;
 		}
+
+		echo json_encode($data);
 	}
 
 	public function get_users()
 	{
-		$this->view_data['users'] = $this->User_model->get_users();
-		$this->load->view('user', $this->view_data);
-	}
 
+	}
 
 	public function get_user($user_id)
 	{
-		$this->view_data['work_history'] = $this->Clock_model->get_history($user_id);
-		$this->load->view('single_user', $this->view_data);
-	}
 
+	}
 }
 ?>

@@ -30,7 +30,7 @@ class User extends DataMapper
 		$this->salt = $user->salt;
 		$this->validate()->get();
 
-		if(emtpy($this->id))
+		if(empty($this->id))
 		{
 			$this->error_message('login', 'Email or password invalid');
 			return FALSE;
@@ -49,7 +49,7 @@ class User extends DataMapper
 			{
 				$this->salt = md5(uniqid(rand(), true));
 			}
-			$this->{$password} = shal($this->salt . $this->{$password});
+			$this->{$password} = sha1($this->salt . $this->{$password});
 		}
 	}
 }
